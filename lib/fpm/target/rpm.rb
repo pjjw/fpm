@@ -2,14 +2,6 @@ require "fpm/package"
 require "fpm/util"
 
 class FPM::Target::Rpm < FPM::Package
-  def self.flags(opts, settings)
-    settings.target[:rpm] = "rpm"
-
-    opts.on("--rpmbuild-define DEFINITION", "Pass a --define argument to rpmbuild.") do |define|
-      (settings.target[:rpmbuild_define] ||= []) << define
-    end
-  end
-
   def architecture
     case @architecture
       when nil
@@ -86,20 +78,12 @@ class FPM::Target::Rpm < FPM::Package
     # TODO(sissel): Abort if 'rpmbuild' tool not found.
 
     %w(BUILD RPMS SRPMS SOURCES SPECS).each { |d| Dir.mkdir(d) }
-    prefixargs = ["rpmbuild", "-ba",
-      "--define", "buildroot #{Dir.pwd}/BUILD",
-      "--define", "_topdir #{Dir.pwd}",
-      "--define", "_sourcedir #{Dir.pwd}",
-      "--define", "_rpmdir #{Dir.pwd}/RPMS"]
-
-    spec = ["#{name}.spec"]
-
-    if defines.empty?
-      args = prefixargs + spec
-    else
-      args = prefixargs + defines.collect{ |define| ["--define", define] }.flatten + spec
-    end
-
+    args = ["rpmbuild", "-ba",
+           "--define", "buildroot #{Dir.pwd}/BUILD",
+           "--define", "_topdir #{Dir.pwd}",
+           "--define", "_sourcedir #{Dir.pwd}",
+           "--define", "_rpmdir #{Dir.pwd}/RPMS",
+           "#{name}.spec"]
     safesystem(*args)
 
     Dir["#{Dir.pwd}/RPMS/**/*.rpm"].each do |path|
