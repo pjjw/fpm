@@ -148,7 +148,7 @@ class FPM::Package
     # find all files in paths given.
     paths = []
     @source.paths.each do |path|
-      Find.find(path) { |p| paths << p }
+      Find.find(path) { |p| paths << p } unless !File.exists?(path)
     end
     #@logger.info(:paths => paths.sort)
     template.result(binding)

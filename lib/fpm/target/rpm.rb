@@ -34,7 +34,7 @@ class FPM::Target::Rpm < FPM::Package
     # find all files in paths given.
     paths = []
     @source.paths.each do |path|
-      Find.find(path) { |p| paths << p }
+      Find.find(path) { |p| paths << p } unless !File.exists?(path)
     end
 
     # Ensure all paths are absolute and don't start with '.'
