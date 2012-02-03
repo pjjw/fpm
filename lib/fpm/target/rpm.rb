@@ -30,7 +30,6 @@ class FPM::Target::Rpm < FPM::Package
         Find.find(path) { |p| paths << p } 
       else
         paths << path
-        puts path
       end
     end
 
